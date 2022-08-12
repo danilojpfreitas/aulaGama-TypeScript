@@ -75,14 +75,9 @@ accountsRouter.delete("/:id", async(req: Request, res: Response) => {
     try {
         const id: number = parseInt(req.params.id, 10)
 
-        const account: Account = await AccountService.find(id)
-
-        if(account) {
             await AccountService.remove(id)
 
-            res.sendStatus(204).send("Account Delete")
-        }
-        res.sendStatus(404).send("Account not found")
+            res.status(204)
     } catch (error: any) {
         res.status(500).send(error.message)
     }

@@ -98,12 +98,8 @@ exports.accountsRouter.put("/:id", (req, res) => __awaiter(void 0, void 0, void 
 exports.accountsRouter.delete("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = parseInt(req.params.id, 10);
-        const account = yield AccountService.find(id);
-        if (account) {
-            yield AccountService.remove(id);
-            res.sendStatus(204).send("Account Delete");
-        }
-        res.sendStatus(404).send("Account not found");
+        yield AccountService.remove(id);
+        res.status(204);
     }
     catch (error) {
         res.status(500).send(error.message);
