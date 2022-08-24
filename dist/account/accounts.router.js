@@ -36,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountsRouter = void 0;
+const client_class_1 = require("./../client/client.class");
 const express_1 = __importDefault(require("express"));
 const AccountService = __importStar(require("./account.service"));
 const cc_class_1 = require("./cc.class");
@@ -44,10 +45,10 @@ exports.accountsRouter = express_1.default.Router();
 exports.accountsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accounts = yield AccountService.findAll();
-        res.status(200).send(accounts);
+        return res.status(200).send(accounts);
     }
     catch (e) {
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
 }));
 exports.accountsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57,26 +58,28 @@ exports.accountsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 
         if (account) {
             return res.status(200).send(account);
         }
-        res.status(404).send("Account not found");
+        return res.status(404).send("Account not found");
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
 }));
 exports.accountsRouter.post("/create", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        let id = new Date().valueOf();
+        let client = new client_class_1.Client(req.body.name, req.body.lastName, req.body.cpf);
         let account;
         if (req.body.type == "cc") {
-            account = new cc_class_1.Cc(req.body.account_number, req.body.agency);
+            account = new cc_class_1.Cc(req.body.account_number, req.body.agency, client, id);
         }
         else {
-            account = new cp_class_1.Cp(req.body.account_number, req.body.agency);
+            account = new cp_class_1.Cp(req.body.account_number, req.body.agency, client, id);
         }
         const newAccount = yield AccountService.create(account);
-        res.status(201).json(newAccount);
+        return res.status(201).json(newAccount);
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
 }));
 exports.accountsRouter.put("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -89,19 +92,35 @@ exports.accountsRouter.put("/:id", (req, res) => __awaiter(void 0, void 0, void 
             return res.status(200).json(updatedAccount);
         }
         const newAccount = yield AccountService.create(accountUpdate);
-        res.status(201).json(newAccount);
+        return res.status(201).json(newAccount);
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
 }));
 exports.accountsRouter.delete("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = parseInt(req.params.id, 10);
         yield AccountService.remove(id);
-        res.status(204);
+        return res.status(204);
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
+    }
+}));
+exports.accountsRouter.post("/:id/deposit", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const account = yield AccountService.find(id);
+        if (account) {
+            const value = parseFloat(req.body.value);
+            const balance = yield AccountService.deposit(id, value);
+            let message = (value <= 0) ? "Negative value is not allowed" : "Deposit made";
+            return res.status(201).json({ message: message, newBalance: balance });
+        }
+        return res.status(404).send("Account not found");
+    }
+    catch (error) {
+        return res.status(500).send(error.message);
     }
 }));

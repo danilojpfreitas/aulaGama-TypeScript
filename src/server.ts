@@ -8,4 +8,4 @@ app.use(express.json())
 
 app.use(accountsRouter)
 
-app.listen(3001, () => console.log("Servidor executado na porta 3001.")); 
+app.listen(3004, () => console.log("Servidor executado na porta 3004.")); 

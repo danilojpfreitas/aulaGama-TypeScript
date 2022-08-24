@@ -8,4 +8,4 @@ const accounts_router_1 = require("./account/accounts.router");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(accounts_router_1.accountsRouter);
-app.listen(3001, () => console.log("Servidor executado na porta 3001."));
+app.listen(3004, () => console.log("Servidor executado na porta 3004."));
