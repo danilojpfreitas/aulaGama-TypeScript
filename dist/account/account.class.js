@@ -23,7 +23,11 @@ class Account {
         return 0;
     }
     withdraw(value) {
-        this.balance -= value;
+        if (value > 0) {
+            this.balance -= value;
+            return this.getBalance();
+        }
+        return 0;
     }
 }
 exports.Account = Account;

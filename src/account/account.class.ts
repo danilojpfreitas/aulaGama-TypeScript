@@ -33,8 +33,14 @@ export class Account {
         return 0
     }
 
-    public withdraw(value: number): void {
-        this.balance -= value
+    public withdraw(value: number): number {
+        if(value > 0){
+            this.balance -= value
+
+            return this.getBalance()
+        }
+        
+        return 0
     }
 
     

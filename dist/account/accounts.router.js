@@ -108,7 +108,7 @@ exports.accountsRouter.delete("/:id", (req, res) => __awaiter(void 0, void 0, vo
         return res.status(500).send(error.message);
     }
 }));
-exports.accountsRouter.post("/:id/deposit", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.accountsRouter.post("/deposit/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = parseInt(req.params.id, 10);
         const account = yield AccountService.find(id);
@@ -116,6 +116,22 @@ exports.accountsRouter.post("/:id/deposit", (req, res) => __awaiter(void 0, void
             const value = parseFloat(req.body.value);
             const balance = yield AccountService.deposit(id, value);
             let message = (value <= 0) ? "Negative value is not allowed" : "Deposit made";
+            return res.status(201).json({ message: message, newBalance: balance });
+        }
+        return res.status(404).send("Account not found");
+    }
+    catch (error) {
+        return res.status(500).send(error.message);
+    }
+}));
+exports.accountsRouter.post("/withdraw/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const account = yield AccountService.find(id);
+        if (account) {
+            const value = parseFloat(req.body.value);
+            const balance = yield AccountService.withdraw(id, value);
+            let message = (value <= 0) ? "Error! Negative or zero value is not valid" : "Withdrawl made";
             return res.status(201).json({ message: message, newBalance: balance });
         }
         return res.status(404).send("Account not found");

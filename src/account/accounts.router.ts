@@ -87,7 +87,7 @@ accountsRouter.delete("/:id", async(req: Request, res: Response) => {
     }
 })
 
-accountsRouter.post("/:id/deposit", async(req: Request, res: Response) => {
+accountsRouter.post("/deposit/:id", async(req: Request, res: Response) => {
     try {
         const id: number = parseInt(req.params.id, 10)
 
@@ -97,6 +97,25 @@ accountsRouter.post("/:id/deposit", async(req: Request, res: Response) => {
             const balance = await AccountService.deposit(id, value)
 
             let message = (value <= 0)? "Negative value is not allowed" : "Deposit made"
+            return res.status(201).json({message: message, newBalance: balance})
+        }
+
+        return res.status(404).send("Account not found")
+    } catch (error: any) {
+        return res.status(500).send(error.message)
+    }
+})
+
+accountsRouter.post("/withdraw/:id", async (req: Request, res: Response) => {
+    try {
+        const id: number = parseInt(req.params.id, 10)
+
+        const account: Account = await AccountService.find(id)
+        if(account) {
+            const value: number = parseFloat(req.body.value)
+            const balance: number | null = await AccountService.withdraw(id, value)
+
+            let message: string = (value <= 0)? "Error! Negative or zero value is not valid" : "Withdrawl made"
             return res.status(201).json({message: message, newBalance: balance})
         }
 
